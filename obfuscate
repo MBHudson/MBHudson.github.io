@@ -1,0 +1,51 @@
+#!/bin/ksh
+#and execute the command:
+#Code:
+
+#printf "Hello World.\nAre we there yet?\nLet's go home, now!\n" | ./obfuscate - | read string
+
+
+#then the command:
+#Code:
+
+#echo "$string"
+# NAME:		obfuscate -- obfuscate text read from one or more files into a
+#			     string that can be decrypted by the dc utility
+#
+# SYNOPSIS:	obfuscate file...
+#
+# OPERANDS:	file	The name of a text file containing text to be
+#			obfuscated or "-" to obfuscate text read from
+#			standard input.
+#
+# APPLICATION USAGE:
+#	To decrypt the obfuscated string produced by obfuscate, use:
+#		obfuscate file | read string	# Get obfuscated text
+# 	Note: Do not use "read -r string" in the above command!
+#		printf '%s\n' "$string"		# Show obfuscated text
+#		echo "$string" | dc		# Decrypt obfuscated text
+#
+#	Although dc can produce artibrary length output, feeding the objuscated
+#	string back into dc for decryption may be limited by {LINE_MAX} and/or
+#	{ARG_MAX} restrictions.
+
+# Initialize a to ASCII character set (skipping NUL)...
+a='\1\2\3\4\5\6\7\10\11\12\13\14\15\16\17\20\21\22\23\24\25\26\27\30\31\32\33'
+a="$a"'\34\35\36\37 !"#$%&'"'"'()*+,-./0123456789:;<=>?@'
+a="$a"'ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\377'
+
+awk -v A="$a" '
+function cline(inline,		i) {
+	printf("256*%d+\n", index(A, "\n"))
+	for(i = length(inline); i; i--) {
+		printf("256*%d+\n", index(A, substr(inline, i, 1)))
+	}
+}
+BEGIN {	print 0
+}
+{	line[NR] = $0
+}
+END {	for(i = NR; i; i--)
+		cline(line[i])
+	printf("[[q]sa[ln0=aln256%%Pln256/snlbx]sb]Pn[snlbxq\n]Pq\n")
+}' "$@" | tee .dc_input | dc
